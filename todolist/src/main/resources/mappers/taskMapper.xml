@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hanwha.task">
+
+	<insert id="insert" parameterType="com.hanwha.model.TaskDTO">
+		insert into task 
+		values(
+		seq_task_id.nextval,
+		#{user_id},
+		#{todo},
+		#{reason},
+		#{priority},
+		to_date(sysdate, 'YYYY/MM/DD hh24:mi:ss'),
+		#{due_date},
+		null,
+		null,
+		0)
+	</insert>
+	
+	<update id="update" parameterType="com.hanwha.model.TaskDTO">
+		update task set
+		todo = #{todo},
+		reason = #{reason},
+		priority = #{priority},
+		due_date = #{due_date},
+		updated_at = to_date(sysdate, 'YYYY/MM/DD hh24:mi:ss') 
+		where task_id = #{task_id}	
+	</update>
+
+	<update id="sendachieve" parameterType="com.hanwha.model.TaskDTO">
+		update task set 
+		deleted_at = to_date(sysdate, 'YYYY/MM/DD hh24:mi:ss') 
+		where task_id = #{task_id}	
+	</update>
+
+	<update id="senddone" parameterType="com.hanwha.model.TaskDTO">
+		update task set 
+		is_done = 1 
+		where task_id = #{task_id}
+	</update>
+
+	<update id="backdone" parameterType="com.hanwha.model.TaskDTO">
+		update task set 
+		is_done = 1,
+		deleted_at = null 
+		where task_id = #{task_id}
+	</update>
+
+	<update id="sendtodo" parameterType="com.hanwha.model.TaskDTO">
+		update task set 
+		is_done = 0 
+		where task_id = #{task_id}
+	</update>
+	
+	<update id="delete" parameterType="int">
+		delete from task where task_id = #{task_id}
+	</update>
+	
+	<select id="selectalltodo" resultType="com.hanwha.model.TaskDTO">
+		select * from task 
+		where user_id = #{user_id} and is_done=0 and deleted_at is null
+		order by priority asc
+	</select>
+	
+ 	<select id="selectalldone" resultType="com.hanwha.model.TaskDTO">
+		select * from task
+		where user_id = #{user_id} and is_done=1 and deleted_at is null
+	</select> 
+	
+	<select id="selectbyid" parameterType="int" resultType="com.hanwha.model.TaskDTO">
+		select * from task where task_id = #{task_id}
+	</select>
+	
+	<select id="selectallachieve" resultType="com.hanwha.model.TaskDTO">
+		select * from task
+		where user_id = #{user_id} and deleted_at is not null
+	</select>
+	
+	
+</mapper>
